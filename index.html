@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Cline Kanban Board</title>
+    <title>ToDo List</title>
     <style>
         * {
             margin: 0;
@@ -200,7 +200,7 @@
     </div>
     
     <script>
-        let tasks = JSON.parse(localStorage.getItem('cline-kanban-tasks')) || [];
+        let tasks = JSON.parse(localStorage.getItem('todo-tasks')) || [];
         let isAddingTask = false;
         
         function renderTasks() {
@@ -334,7 +334,7 @@
         }
         
         function saveTasks() {
-            localStorage.setItem('cline-kanban-tasks', JSON.stringify(tasks));
+            localStorage.setItem('todo-tasks', JSON.stringify(tasks));
         }
         
         // Keyboard shortcut for adding tasks (Ctrl+T)
