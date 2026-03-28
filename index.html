@@ -221,10 +221,10 @@
                     <p>${task.description}</p>
                     <span class="task-id">ID: ${task.id} | Created: ${task.createdAt}</span>
                     <div class="task-actions">
-                        ${task.status !== 'todo' ? '<button onclick="moveTask(\'' + task.id + '\', \'todo\')">← To Do</button>' : ''}
-                        ${task.status !== 'inprogress' ? '<button onclick="moveTask(\'' + task.id + '\', \'inprogress\')">→ In Progress</button>' : ''}
-                        ${task.status !== 'done' ? '<button onclick="moveTask(\'' + task.id + '\', \'done\')">→ Done</button>' : ''}
-                        <button class="delete" onclick="deleteTask(\'' + task.id + '\')">Delete</button>
+                        ${task.status !== 'todo' ? '<button onclick="moveTask(' + task.id + ', \'todo\')">← To Do</button>' : ''}
+                        ${task.status !== 'inprogress' ? '<button onclick="moveTask(' + task.id + ', \'inprogress\')">→ In Progress</button>' : ''}
+                        ${task.status !== 'done' ? '<button onclick="moveTask(' + task.id + ', \'done\')">→ Done</button>' : ''}
+                        <button class="delete" onclick="deleteTask(' + task.id + ')">Delete</button>
                     </div>
                 `;
                 
@@ -325,11 +325,17 @@
         }
         
         function moveTask(id, newStatus) {
-            const taskIndex = tasks.findIndex(t => t.id === id);
+            console.log('moveTask called:', { id, newStatus, currentTasks: tasks });
+            const taskIndex = tasks.findIndex(t => t.id === parseInt(id));
             if (taskIndex !== -1) {
+                console.log('Task found at index:', taskIndex);
+                console.log('Changing status from:', tasks[taskIndex].status, 'to:', newStatus);
                 tasks[taskIndex].status = newStatus;
                 saveTasks();
+                console.log('Tasks saved and re-rendering...');
                 renderTasks();
+            } else {
+                console.error('Task not found with id:', id);
             }
         }
         
