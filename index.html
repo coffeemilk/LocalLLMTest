@@ -216,17 +216,55 @@
                 const card = document.createElement('div');
                 card.className = 'task-card';
                 card.draggable = true;
-                card.innerHTML = `
-                    <h3>${task.title}</h3>
-                    <p>${task.description}</p>
-                    <span class="task-id">ID: ${task.id} | Created: ${task.createdAt}</span>
-                    <div class="task-actions">
-                        ${task.status !== 'todo' ? '<button onclick="moveTask(' + task.id + ', \'todo\')">← To Do</button>' : ''}
-                        ${task.status !== 'inprogress' ? '<button onclick="moveTask(' + task.id + ', \'inprogress\')">→ In Progress</button>' : ''}
-                        ${task.status !== 'done' ? '<button onclick="moveTask(' + task.id + ', \'done\')">→ Done</button>' : ''}
-                        <button class="delete" onclick="deleteTask(' + task.id + ')">Delete</button>
-                    </div>
-                `;
+                
+                const titleEl = document.createElement('h3');
+                titleEl.textContent = task.title;
+                
+                const descEl = document.createElement('p');
+                descEl.textContent = task.description;
+                
+                const idEl = document.createElement('span');
+                idEl.className = 'task-id';
+                idEl.textContent = `ID: ${task.id} | Created: ${task.createdAt}`;
+                
+                const actionsDiv = document.createElement('div');
+                actionsDiv.className = 'task-actions';
+                
+                // To Do button
+                if (task.status !== 'todo') {
+                    const todoBtn = document.createElement('button');
+                    todoBtn.textContent = '← To Do';
+                    todoBtn.addEventListener('click', () => moveTask(task.id, 'todo'));
+                    actionsDiv.appendChild(todoBtn);
+                }
+                
+                // In Progress button
+                if (task.status !== 'inprogress') {
+                    const inprogressBtn = document.createElement('button');
+                    inprogressBtn.textContent = '→ In Progress';
+                    inprogressBtn.addEventListener('click', () => moveTask(task.id, 'inprogress'));
+                    actionsDiv.appendChild(inprogressBtn);
+                }
+                
+                // Done button
+                if (task.status !== 'done') {
+                    const doneBtn = document.createElement('button');
+                    doneBtn.textContent = '→ Done';
+                    doneBtn.addEventListener('click', () => moveTask(task.id, 'done'));
+                    actionsDiv.appendChild(doneBtn);
+                }
+                
+                // Delete button
+                const deleteBtn = document.createElement('button');
+                deleteBtn.className = 'delete';
+                deleteBtn.textContent = 'Delete';
+                deleteBtn.addEventListener('click', () => deleteTask(task.id));
+                actionsDiv.appendChild(deleteBtn);
+                
+                card.appendChild(titleEl);
+                card.appendChild(descEl);
+                card.appendChild(idEl);
+                card.appendChild(actionsDiv);
                 
                 card.addEventListener('dragstart', () => {
                     card.style.opacity = '0.5';
@@ -243,7 +281,7 @@
                 card.addEventListener('drop', (e) => {
                     e.preventDefault();
                     const newStatus = e.target.closest('.column').querySelector('h2').innerText.split(' ')[1].toLowerCase();
-                    const taskIndex = tasks.findIndex(t => t.id === task.id);
+                    const taskIndex = tasks.findIndex(t => Number(t.id) === Number(task.id));
                     if (taskIndex !== -1) {
                         tasks[taskIndex].status = newStatus;
                         saveTasks();
@@ -317,16 +355,28 @@
         }
         
         function deleteTask(id) {
+            console.log('deleteTask called with id:', id);
             if (confirm('Are you sure you want to delete this task?')) {
-                tasks = tasks.filter(t => t.id !== id);
-                saveTasks();
-                renderTasks();
+                console.log('Confirm accepted, searching for task...');
+                const taskIndex = tasks.findIndex(t => Number(t.id) === Number(id));
+                console.log('Task index:', taskIndex, 'tasks:', tasks);
+                if (taskIndex !== -1) {
+                    console.log('Deleting task...');
+                    tasks = tasks.filter(t => Number(t.id) !== Number(id));
+                    saveTasks();
+                    console.log('Tasks saved and re-rendering...');
+                    renderTasks();
+                } else {
+                    console.error('Task not found with id:', id);
+                }
+            } else {
+                console.log('Delete cancelled');
             }
         }
         
         function moveTask(id, newStatus) {
             console.log('moveTask called:', { id, newStatus, currentTasks: tasks });
-            const taskIndex = tasks.findIndex(t => t.id === parseInt(id));
+            const taskIndex = tasks.findIndex(t => Number(t.id) === Number(id));
             if (taskIndex !== -1) {
                 console.log('Task found at index:', taskIndex);
                 console.log('Changing status from:', tasks[taskIndex].status, 'to:', newStatus);
